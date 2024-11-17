@@ -3,7 +3,7 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - development  
+      - development 
 
 jobs:
   deploy:
@@ -12,14 +12,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install sshpass
-        run: sudo apt-get install sshpass
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
-      - name: Deploy files to server
+      - name: Transfer files to server
         env:
-          HOST: ${{ secrets.HOST }}
-          USER: ${{ secrets.USER }}
-          TARGET_DIRECTORY: ${{ secrets.TARGET_DIRECTORY }}
-          PASSWORD: ${{ secrets.DROPLET_PASSWORD }}
+          HOST: ${{ secrets.DROPLET_IP }}
+          USER: ${{ secrets.DROPLET_USER }}
+          TARGET: ${{ secrets.TARGET_DIRECTORY }}
         run: |
-          sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no -r ./* $USER@$HOST:$REMOTE_DIR
+          rsync -avz --delete ./ $USER@$HOST:$TARGET
