@@ -13,16 +13,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy to DigitalOcean
-        uses: appleboy/ssh-action@master
-        with:
+        env:
+          project_directory: ${{ secrets.PROJECT_DIRECTORY }}
+          target_directory: ${{ secrets.TARGET_DIRECTORY }}
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          project_directory: ${{ secrets.PROJECT_DIRECTORY }}
-          target_directory: ${{ secrets.TARGET_DIRECTORY }}
-          script: |
-            echo "Deploying to DigitalOcean droplet..."
-            run: |
+        run: |
             cd $project_directory
             mkdir -p $directory
             # Rsync files to the droplet
