@@ -20,6 +20,6 @@ jobs:
           HOST: ${{ secrets.HOST }}
           USER: ${{ secrets.USER }}
           TARGET_DIRECTORY: ${{ secrets.TARGET_DIRECTORY }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          PASSWORD: ${{ secrets.DROPLET_PASSWORD }}
         run: |
           sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no -r ./* $USER@$HOST:$REMOTE_DIR
