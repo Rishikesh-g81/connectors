@@ -18,13 +18,20 @@ jobs:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          project_directory: ${{ secrets.PROJECT_DIRECTORY }}
+          target_directory: ${{ secrets.TARGET_DIRECTORY }}
           script: |
             echo "Deploying to DigitalOcean droplet..."
-            
-            # Navigate to the target directory
-            cd /home/user/Projects/connectors
-            
-            # Overwrite the file
-            echo "New content" 
-            
-            echo "File overwritten successfully."
+            run: |
+            cd $project_directory
+            mkdir -p $directory
+            # Rsync files to the droplet
+            rsync -avz --delete ./ root@$host:$target_directory
+
+      - name: Update Git repository
+        run: |
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+            git add .
+            git commit -m "Update deployed files"
+            git push
