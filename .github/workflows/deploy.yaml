@@ -11,28 +11,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Deploy to DigitalOcean
-        uses: appleboy/ssh-action@master
+        
+      - name: Deploy to Linux System
         env:
-          PROJECT_DIRECTORY: ${{ secrets.PROJECT_DIRECTORY }}
+          HOST: ${{ secrets.HOST }}
+          USER: ${{ secrets.USER }}
           TARGET_DIRECTORY: ${{ secrets.TARGET_DIRECTORY }}
-          HOST: ${{ secrets.DROPLET_IP }}
-          USERNAME: ${{ secrets.DROPLET_USER }}
-        with:
-          host: ${{ secrets.DROPLET_IP }}
-          username: ${{ secrets.DROPLET_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
             echo "Deploying to DigitalOcean droplet..."
-            
-            # Navigate to project directory
-            cd $PROJECT_DIRECTORY
+            # Set up SSH key
+            mkdir -p ~/.ssh
+            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
 
-            # Create/update if directory exists
-            mkdir -p $TARGET_DIRECTORY
-            
-            # Rsync files to the droplet
-            rsync -avz --delete ./ $USERNAME@$HOST:$TARGET_DIRECTORY 
-            
+            # Rsync files to the Linux system
+            rsync -avz --delete ./ $USER@$HOST:$TARGET_DIRECTORY
             echo "Directory overwritten successfully."
