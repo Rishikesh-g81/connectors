@@ -20,11 +20,6 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
             echo "Deploying to DigitalOcean droplet..."
-            # Set up SSH key
-            mkdir -p ~/.ssh
-            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
-            ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
 
             # Rsync files to the Linux system
             rsync -avz --delete ./ $USER@$HOST:$TARGET_DIRECTORY
