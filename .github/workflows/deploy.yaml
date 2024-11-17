@@ -1,4 +1,4 @@
-name: Deploy to DigitalOcean
+          name: Deploy to DigitalOcean
 
 on:
   push:
@@ -13,22 +13,23 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy to DigitalOcean
+        uses: appleboy/ssh-action@master
         env:
-          project_directory: ${{ secrets.PROJECT_DIRECTORY }}
-          target_directory: ${{ secrets.TARGET_DIRECTORY }}
+          PROJECT_DIRECTORY: ${{ secrets.PROJECT_DIRECTORY }}
+          TARGET_DIRECTORY: ${{ secrets.TARGET_DIRECTORY }}
+          HOST: ${{ secrets.DROPLET_IP }}
+          USERNAME: ${{ secrets.DROPLET_USER }}
+        with:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-            cd $project_directory
-            mkdir -p $directory
-            # Rsync files to the droplet
-            rsync -avz --delete ./ root@$host:$target_directory
+          script: |
+            echo "Deploying to DigitalOcean droplet..."
+            
+            # Navigate to project directory
+            cd $PROJECT_DIRECTORY
 
-      - name: Update Git repository
-        run: |
-            git config user.name github-actions
-            git config user.email github-actions@github.com
-            git add .
-            git commit -m "Update deployed files"
-            git push
+            # Rsync files to the droplet
+            rsync -avz --delete ./ $USERNAME@$HOST:$TARGET_DIRECTORY 
+            
+            echo "Directory overwritten successfully."
