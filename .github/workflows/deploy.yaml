@@ -3,7 +3,7 @@ name: Deploy to DigitalOcean
 on:
   push:
     branches:
-      - qa
+      - development
 
 jobs:
   deploy:
@@ -29,6 +29,9 @@ jobs:
             # Navigate to project directory
             cd $PROJECT_DIRECTORY
 
+            # Create/update if directory exists
+            mkdir -p $TARGET_DIRECTORY
+            
             # Rsync files to the droplet
             rsync -avz --delete ./ $USERNAME@$HOST:$TARGET_DIRECTORY 
             
