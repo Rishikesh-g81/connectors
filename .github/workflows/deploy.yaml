@@ -1,26 +1,25 @@
-name: Deploy to DigitalOcean
+name: Deploy to Server
 
 on:
   push:
     branches:
-      - development
+      - development  
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Deploy to Linux System
+        uses: actions/checkout@v3
+
+      - name: Install sshpass
+        run: sudo apt-get install sshpass
+
+      - name: Deploy files to server
         env:
           HOST: ${{ secrets.HOST }}
           USER: ${{ secrets.USER }}
           TARGET_DIRECTORY: ${{ secrets.TARGET_DIRECTORY }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-            echo "Deploying to DigitalOcean droplet..."
-
-            # Rsync files to the Linux system
-            rsync -avz --delete ./ $USER@$HOST:$TARGET_DIRECTORY
-            echo "Directory overwritten successfully."
+          sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no -r ./* $USER@$HOST:$REMOTE_DIR
